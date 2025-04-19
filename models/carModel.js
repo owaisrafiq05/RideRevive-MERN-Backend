@@ -47,12 +47,6 @@ const carSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
-    additionalDetails: {
-      type: String
-    },
-    images: [{
-      type: String
-    }]
   },
   {
     timestamps: true
