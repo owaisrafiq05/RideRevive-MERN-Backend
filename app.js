@@ -1,7 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import userRoutes from './routes/userRoutes.js';
+
 
 dotenv.config();
 
@@ -10,6 +12,9 @@ const port = 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
+
+// Enable CORS for all routes
+app.use(cors());
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
