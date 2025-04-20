@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import userRoutes from './routes/userRoutes.js';
+import carRoutes from './routes/carRoutes.js';
 
 
 dotenv.config();
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
+app.use('/api/cars', carRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
