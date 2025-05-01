@@ -4,14 +4,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 import userRoutes from './routes/userRoutes.js';
 import carRoutes from './routes/carRoutes.js';
-
+import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 
 const app = express();
 const port = 3000;
 
-// Middleware to parse JSON
+// Standard middleware for parsing JSON
 app.use(express.json());
 
 // Enable CORS for all routes
@@ -31,6 +31,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/cars', carRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
