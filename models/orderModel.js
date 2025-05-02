@@ -19,12 +19,26 @@ const orderSchema = new mongoose.Schema(
           ref: 'Service',
           required: true
         },
+        serviceName: {
+          type: String,
+          required: true
+        },
         price: {
           type: Number,
           required: true
         }
       }
     ],
+    address: {
+      fullAddress: {
+        type: String,
+        required: true
+      },
+      coordinates: {
+        lng: Number,
+        lat: Number
+      }
+    },
     status: {
       type: String,
       enum: [

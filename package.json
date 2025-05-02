@@ -5,7 +5,9 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "dev": "nodemon app.js",
+    "seed-services": "node scripts/seedServices.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

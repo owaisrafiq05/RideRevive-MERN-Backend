@@ -5,6 +5,13 @@ import cors from "cors";
 import userRoutes from './routes/userRoutes.js';
 import carRoutes from './routes/carRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import serviceRoutes from './routes/serviceRoutes.js';
+
+// Import all models to ensure they are registered with Mongoose
+import './models/userModel.js';
+import './models/carModel.js';
+import './models/orderModel.js';
+import './models/serviceModel.js';
 
 dotenv.config();
 
@@ -32,6 +39,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/services', serviceRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

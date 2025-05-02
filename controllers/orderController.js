@@ -1,4 +1,5 @@
 import Order from '../models/orderModel.js';
+import Service from '../models/serviceModel.js';
 
 // Create a new order
 export const createOrderController = async (req, res) => {
@@ -7,6 +8,7 @@ export const createOrderController = async (req, res) => {
       userId, 
       carId, 
       services,
+      address,
       totalAmount,
       scheduledDate,
       specialInstructions,
@@ -19,6 +21,7 @@ export const createOrderController = async (req, res) => {
       user: userId,
       car: carId,
       services,
+      address,
       totalAmount,
       scheduledDate: new Date(scheduledDate),
       specialInstructions,
@@ -50,6 +53,8 @@ export const createOrderController = async (req, res) => {
 // Get all orders
 export const getAllOrdersController = async (req, res) => {
   try {
+    await Service.init();
+    
     const orders = await Order.find()
       .populate('user', 'name email phone')
       .populate('car')
@@ -74,6 +79,8 @@ export const getAllOrdersController = async (req, res) => {
 export const getOrdersByUserIdController = async (req, res) => {
   try {
     const { userId } = req.params;
+    
+    await Service.init();
     
     const orders = await Order.find({ user: userId })
       .populate('car')
@@ -100,6 +107,8 @@ export const getOrderByIdController = async (req, res) => {
   try {
     const { orderId } = req.params;
     
+    await Service.init();
+    
     const order = await Order.findById(orderId)
       .populate('user', 'name email phone')
       .populate('car')
@@ -121,6 +130,83 @@ export const getOrderByIdController = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch order',
+      error: error.message
+    });
+  }
+};
+
+// Update order status
+export const updateOrderStatusController = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    
+    // Validate status
+    const validStatuses = ['pending', 'approved', 'in-progress', 'completed', 'cancelled', 'rejected'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status value'
+      });
+    }
+    
+    const order = await Order.findById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+    
+    // Update status
+    order.status = status;
+    await order.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Order status updated successfully',
+      data: order
+    });
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update order status',
+      error: error.message
+    });
+  }
+};
+
+// Update admin notes
+export const updateAdminNotesController = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { adminNotes } = req.body;
+    
+    const order = await Order.findById(orderId);
+    
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+    
+    // Update admin notes
+    order.adminNotes = adminNotes;
+    await order.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Admin notes updated successfully',
+      data: order
+    });
+  } catch (error) {
+    console.error('Error updating admin notes:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update admin notes',
       error: error.message
     });
   }
