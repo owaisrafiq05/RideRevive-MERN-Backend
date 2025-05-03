@@ -26,6 +26,10 @@ const orderSchema = new mongoose.Schema(
         price: {
           type: Number,
           required: true
+        },
+        serviceDetails: {
+          type: mongoose.Schema.Types.Mixed,
+          description: 'Form-specific details for the service'
         }
       }
     ],
@@ -83,6 +87,16 @@ const orderSchema = new mongoose.Schema(
       type: String
     },
     isReviewed: {
+      type: Boolean,
+      default: false
+    },
+    contactName: {
+      type: String
+    },
+    contactPhone: {
+      type: String
+    },
+    isEmergency: {
       type: Boolean,
       default: false
     }

@@ -14,14 +14,40 @@ export const createOrderController = async (req, res) => {
       scheduledDate,
       specialInstructions,
       paymentMethod,
-      paymentStatus
+      paymentStatus,
+      contactName,
+      contactPhone,
+      isEmergency
     } = req.body;
+    
+    // Validate that services contain the required fields
+    if (!services || !Array.isArray(services) || services.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one service is required'
+      });
+    }
+
+    // Validate each service has the necessary fields
+    for (const serviceItem of services) {
+      if (!serviceItem.service || !serviceItem.serviceName || !serviceItem.price) {
+        return res.status(400).json({
+          success: false,
+          message: 'Each service must include service ID, name, and price'
+        });
+      }
+    }
     
     // Create new order
     const newOrder = new Order({
       user: userId,
       car: carId,
-      services,
+      services: services.map(service => ({
+        service: service.service,
+        serviceName: service.serviceName,
+        price: service.price,
+        serviceDetails: service.serviceDetails || {} // Include service details or empty object
+      })),
       address,
       totalAmount,
       scheduledDate: new Date(scheduledDate),
@@ -31,7 +57,10 @@ export const createOrderController = async (req, res) => {
       paymentDetails: {
         transactionId: `manual-${Date.now()}`,
         paymentDate: new Date()
-      }
+      },
+      contactName,
+      contactPhone,
+      isEmergency: isEmergency || false
     });
     
     await newOrder.save();
@@ -59,7 +88,8 @@ export const getAllOrdersController = async (req, res) => {
     const orders = await Order.find()
       .populate('user', 'name email phone')
       .populate('car')
-      .populate('services.service');
+      .populate('services.service')
+      .sort({ createdAt: -1 });
     
     res.status(200).json({
       success: true,
@@ -204,7 +234,21 @@ export const updateAdminNotesController = async (req, res) => {
     const { orderId } = req.params;
     const { adminNotes } = req.body;
     
-    const order = await Order.findById(orderId);
+    if (adminNotes === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Admin notes are required'
+      });
+    }
+    
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { adminNotes },
+      { new: true }
+    )
+    .populate('user', 'name email phone')
+    .populate('car')
+    .populate('services.service');
     
     if (!order) {
       return res.status(404).json({
@@ -212,10 +256,6 @@ export const updateAdminNotesController = async (req, res) => {
         message: 'Order not found'
       });
     }
-    
-    // Update admin notes
-    order.adminNotes = adminNotes;
-    await order.save();
     
     res.status(200).json({
       success: true,
