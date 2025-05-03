@@ -1,5 +1,6 @@
 import Order from '../models/orderModel.js';
 import Service from '../models/serviceModel.js';
+import { sendOrderApprovedEmail } from '../utils/emailService.js';
 
 // Create a new order
 export const createOrderController = async (req, res) => {
@@ -150,7 +151,11 @@ export const updateOrderStatusController = async (req, res) => {
       });
     }
     
-    const order = await Order.findById(orderId);
+    // Get the order with populated user, car, and services data
+    const order = await Order.findById(orderId)
+      .populate('user', 'name email phone')
+      .populate('car')
+      .populate('services.service');
     
     if (!order) {
       return res.status(404).json({
@@ -159,9 +164,24 @@ export const updateOrderStatusController = async (req, res) => {
       });
     }
     
+    // Save previous status to check if it changed
+    const previousStatus = order.status;
+    
     // Update status
     order.status = status;
     await order.save();
+    
+    // Send email notification if order status changed to approved
+    if (status === 'approved' && previousStatus !== 'approved') {
+      try {
+        // Send the email notification
+        await sendOrderApprovedEmail(order);
+        console.log(`Email notification sent to ${order.user.email} for order ${order._id}`);
+      } catch (emailError) {
+        // Log the error but don't fail the API request
+        console.error('Failed to send email notification:', emailError);
+      }
+    }
     
     res.status(200).json({
       success: true,
