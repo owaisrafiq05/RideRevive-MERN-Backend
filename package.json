@@ -8,6 +8,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "seed-services": "node scripts/seedServices.js",
+    "add-admin": "node --experimental-specifier-resolution=node ./scripts/addAdmin.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

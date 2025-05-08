@@ -6,6 +6,7 @@ import userRoutes from './routes/userRoutes.js';
 import carRoutes from './routes/carRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Import all models to ensure they are registered with Mongoose
 import './models/userModel.js';
@@ -40,6 +41,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
